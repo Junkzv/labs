@@ -36,9 +36,13 @@ namespace CalendarApp
         public void AddEvent(Event e)
         {
             if (e == null)
-            {
                 throw new ArgumentNullException(nameof(e));
-            }
+
+            if (string.IsNullOrWhiteSpace(e.Description))
+                throw new ArgumentException("Описание события не может быть пустым.");
+
+            if (e.Date < DateTime.Today)
+                throw new ArgumentException("Нельзя добавить событие на прошедшую дату.");
 
             Events.Add(e);
             SaveEvents();
@@ -47,35 +51,46 @@ namespace CalendarApp
         public void RemoveEvent(Event e)
         {
             if (e == null)
-            {
                 throw new ArgumentNullException(nameof(e));
-            }
 
             Events.Remove(e);
             SaveEvents();
         }
 
+        public void UpdateEvent(Event oldEvent, DateTime newDate, string newDescription)
+        {
+            if (oldEvent == null)
+                throw new ArgumentNullException(nameof(oldEvent));
+
+            if (string.IsNullOrWhiteSpace(newDescription))
+                throw new ArgumentException("Описание события не может быть пустым.");
+
+            if (newDate < DateTime.Today)
+                throw new ArgumentException("Нельзя установить прошедшую дату.");
+
+            oldEvent.Date = newDate;
+            oldEvent.Description = newDescription;
+            SaveEvents();
+        }
+
         public void SaveEvents()
         {
-            File.WriteAllLines(FilePath, Events.Select(e =>
-                $"{e.Date:yyyy-MM-dd}|{e.Description}"));
+            File.WriteAllLines(FilePath,
+                Events.Select(e => $"{e.Date:yyyy-MM-dd}|{e.Description}"));
         }
 
         public void LoadEvents()
         {
-            if (File.Exists(FilePath))
+            if (!File.Exists(FilePath))
+                return;
+
+            var lines = File.ReadAllLines(FilePath);
+            foreach (var line in lines)
             {
-                var lines = File.ReadAllLines(FilePath);
-                foreach (var line in lines)
+                var parts = line.Split('|');
+                if (parts.Length == 2 && DateTime.TryParse(parts[0], out DateTime date))
                 {
-                    var parts = line.Split('|');
-                    if (parts.Length == 2)
-                    {
-                        if (DateTime.TryParse(parts[0], out DateTime date))
-                        {
-                            Events.Add(new Event(date, parts[1]));
-                        }
-                    }
+                    Events.Add(new Event(date, parts[1]));
                 }
             }
         }
