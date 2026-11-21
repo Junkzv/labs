@@ -6,6 +6,12 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.0</Version>
+    <AssemblyTitle>Календарь событий</AssemblyTitle>
+    <Company>КП-21</Company>
+    <Description>Приложение для управления событиями в календаре</Description>
   </PropertyGroup>
 
 </Project>
